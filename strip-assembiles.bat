@@ -15,23 +15,29 @@ set exePath=%exePath:"=%
 set managedPath=%exePath:.exe=_Data\Managed%
 echo managedPath: %managedPath%
 
+set bepinexPath=%~dp1\BepInEx
+echo bepinexPath: %bepinexPath%
+
+set interopPath=%bepinexPath%\interop
+echo interopPath: %interopPath%
+
 set outPath=%~dp0\package\lib
 
 @REM Strip all assembiles, but keep them private.
-%~dp0\tools\NStrip.exe "%managedPath%" -o %outPath%
+%~dp0\tools\NStrip.exe "%interopPath%" -o %outPath%
 
 @REM Strip and publicize assemblies from toPublicize.
 (for %%a in (%toPublicize%) do (
   echo a: %%a
 
-  %~dp0\tools\NStrip.exe "%managedPath%\%%a" -o "%outPath%\%%a" -cg -p --cg-exclude-events
+  %~dp0\tools\NStrip.exe "%interopPath%\%%a" -o "%outPath%\%%a" -cg -p --cg-exclude-events
 ))
 
 @REM Copy over original assemblies for ones we don't want to touch.
 (for %%a in (%dontTouch%) do (
   echo a: %%a
 
-  xcopy "%managedPath%\%%a" "%outPath%\%%a" /y /v
+  xcopy "%interopPath%\%%a" "%outPath%\%%a" /y /v
 ))
 
 pause
